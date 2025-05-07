@@ -93,8 +93,24 @@ class PolyView(tk.Tk):
             self.canvas.create_text(x, y, text=str(vertices[i]), tags=f"val_{i}")
 
     def show_toast(self, message):
+        """显示提示消息"""
         self.status_label.config(text=message)
-        self.after(2000, lambda: self.status_label.config(text="游戏就绪"))
+        # 如果是游戏结束的消息，使用更醒目的样式
+        if "游戏结束" in message:
+            self.status_label.config(fg="red", font=("Arial", 12, "bold"))
+            # 5秒后恢复默认样式
+            self.after(5000, lambda: self.status_label.config(
+                text="游戏就绪",
+                fg="black",
+                font=("Arial", 10, "normal")
+            ))
+        else:
+            # 其他消息2秒后消失
+            self.after(2000, lambda: self.status_label.config(
+                text="游戏就绪",
+                fg="black",
+                font=("Arial", 10, "normal")
+            ))
 
     def on_canvas_click(self, event):
         closest = None
