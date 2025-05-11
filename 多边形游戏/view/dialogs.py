@@ -197,3 +197,40 @@ class ManualInputDialog(tk.Toplevel):
 
         self.callback(vertices, operators)
         self.destroy()
+
+
+import tkinter as tk
+from tkinter import simpledialog
+
+class DifficultySelectDialog(tk.Toplevel):
+    def __init__(self, parent, callback):
+        super().__init__(parent)
+        self.title("选择 AI 难度")
+        self.callback = callback
+        self.transient(parent)
+        self.grab_set()
+        self.focus_set()  # 确保对话框获取焦点
+        self.protocol("WM_DELETE_WINDOW", self._on_close)  # 禁止直接叉掉
+
+        tk.Label(self, text="请选择 AI 难度", font=("Arial", 12, "bold")).pack(pady=10)
+
+        btn_frame = tk.Frame(self)
+        btn_frame.pack(padx=10, pady=10)
+
+        difficulties = ["easy", "easy++", "medium", "hard", "hard++"]
+        for i, level in enumerate(difficulties):
+            b = tk.Button(btn_frame, text=level, width=10,
+                          command=lambda lv=level: self._select(lv))
+            b.grid(row=i // 3, column=i % 3, padx=8, pady=5)
+
+    def _select(self, level):
+        self.grab_release()  # ← 最关键
+        self.callback(level)
+        print(f"选择了难度: {level}")
+        self.destroy()
+
+    def _on_close(self):
+        self.grab_release()
+        self.destroy()
+
+

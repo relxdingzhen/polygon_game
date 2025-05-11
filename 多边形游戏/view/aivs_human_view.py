@@ -1,7 +1,7 @@
 # view/aivs_human_view.py
 import math
 import tkinter as tk
-
+from tkinter import simpledialog
 class PolygonBoard(tk.Canvas):
     def __init__(self, master, click_callback=None, **kw):
         super().__init__(master, width=400, height=300, bg="white", **kw)
@@ -92,18 +92,31 @@ class AIVsHumanView(tk.Toplevel):
         self.ai_board.pack(side=tk.LEFT, padx=10, pady=5)
 
         # ---- 底部按钮 ----
-        btns = tk.Frame(self); btns.pack(pady=8)
-        self.new_btn   = tk.Button(btns, text="重玩", width=8,
-                                   command=presenter.new_game, state=tk.DISABLED)
-        # self.solve_btn = tk.Button(btns, text="查看AI最优解", width=14,
-        #                            command=presenter.show_solution, state=tk.DISABLED)
-        tk.Button(btns, text="退出", width=6, command=self._back).pack(side=tk.LEFT, padx=8)
-        self.new_btn.pack(side=tk.LEFT, padx=8)
-        # self.solve_btn.pack(side=tk.LEFT, padx=8)
+        # ---- 底部区域 ----
+        bottom = tk.Frame(self)
+        bottom.pack(pady=10)
 
-        # ---- Toast ----
-        self.toast = tk.Label(self, text="", fg="blue")
-        self.toast.pack()
+        # --- 难度选择 ---
+        # difficulty_frame = tk.Frame(bottom)
+        # tk.Label(difficulty_frame, text="AI难度:").pack(side=tk.LEFT)
+        # self.difficulty_var = tk.StringVar(value="easy")
+        # tk.OptionMenu(difficulty_frame, self.difficulty_var, "easy", "hard").pack(side=tk.LEFT, padx=6)
+        # difficulty_frame.pack(pady=4)
+
+        # --- 控制按钮 ---
+        button_frame = tk.Frame(bottom)
+        self.new_btn = tk.Button(button_frame, text="重玩", width=8,
+                                 command=self.presenter.new_game, state=tk.DISABLED)
+        exit_btn = tk.Button(button_frame, text="退出", width=6, command=self._back)
+        self.new_btn.pack(side=tk.LEFT, padx=8)
+        exit_btn.pack(side=tk.LEFT, padx=8)
+        button_frame.pack(pady=4)
+
+        # --- Toast 信息 ---
+        self.toast = tk.Label(bottom, text="", fg="blue")
+        self.toast.pack(pady=6)
+
+        print("新建按钮状态：", self.new_btn)
 
     # -------- 接口供 presenter 调用，也是提供两个画布--------
     def draw_player(self, v, op): self.player_board.draw(v, op)

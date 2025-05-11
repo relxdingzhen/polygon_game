@@ -6,7 +6,7 @@ from typing import List
 
 from model.aivs_human_game import AIModel
 from view.aivs_human_view import AIVsHumanView
-
+from view.dialogs import DifficultySelectDialog
 class AIVsHumanPresenter:
     def __init__(self, root):
         self.root = root               # 传入顶窗口或上一页面
@@ -14,7 +14,29 @@ class AIVsHumanPresenter:
         self.new_game()                # 自动开局
 
     # ---------- 开新局 ----------
-    def new_game(self):
+    def new_game(self, difficulty=None):
+        if difficulty is None:
+            selected = self._show_difficulty_dialog()
+            if not selected:
+                return
+            difficulty = selected
+
+        self._start_game_with_difficulty(difficulty)
+
+    def _show_difficulty_dialog(self):
+        result = {"choice": None}
+
+        def set_choice(choice):
+            result["choice"] = choice
+            dialog.destroy()
+
+        dialog = DifficultySelectDialog(self.view, callback=set_choice)
+        self.view.wait_window(dialog)  # 等待选择完成
+        return result["choice"]
+
+    def _on_difficulty_selected(self, difficulty):
+        self._start_game_with_difficulty(difficulty)
+    def _start_game_with_difficulty(self,difficulty="easy"):
         n = simpledialog.askinteger("配置", "顶点数 n (3-10):",
                                      minvalue=3, maxvalue=10, parent=self.view)
         if not n: return
@@ -29,8 +51,10 @@ class AIVsHumanPresenter:
         ops = [random.choice(['+', '*']) for _ in range(n)]
 
         # 模型 ×2
-        self.player = AIModel(); self.player.initialize(n, vertices, ops)
-        self.ai = AIModel(); self.ai.initialize    (n, vertices, ops)
+        self.player = AIModel();
+        self.player.initialize(n, vertices, ops)
+        self.ai = AIModel(difficulty = difficulty);
+        self.ai.initialize(n, vertices, ops)
 
         # 初始渲染
         self.view.draw_player(vertices, ops)

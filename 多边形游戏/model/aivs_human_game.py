@@ -4,10 +4,11 @@ import random
 
 class AIModel:
     """棋盘模型 + 动态规划求最大得分"""
-    def __init__(self):
+    def __init__(self,difficulty='hard'):
         self.vertices = []
         self.operators = []
         self.history = []
+        self.difficulty = difficulty
 
     # ---------- 初始化 ----------
     def initialize(self, n, vertices=None, operators=None,
@@ -49,21 +50,93 @@ class AIModel:
             "operators": copy.deepcopy(self.operators)
         })
         return True
+    #-----------四种方案的具体实现---------------
+    #easy-随机策略
+    def _random_strategy(self):
+        return random.randint(0, len(self.operators) - 1)
 
-    # ---------- AI 选边：贪心枚举 + DP 评估 ----------
-    def get_best_edge(self) -> int:
-        """返回当前局面使最终最大得分最大的边索引"""
-        if len(self.vertices) <= 1:
-            return 0
-        best_edge, best_score = 0, -float('inf')
-        for idx in range(len(self.operators)):
+    #easy++-最大值贪心策略
+    def _max_greedy_strategy(self):
+        best_idx, best_val = 0, -float('inf')
+        for i in range(len(self.operators)):
+            a, b = self.vertices[i], self.vertices[(i + 1) % len(self.vertices)]
+            val = a + b if self.operators[i] == '+' else a * b
+            if val > best_val:
+                best_val = val
+                best_idx = i
+        return best_idx
+
+    #medium-2步前瞻
+    def _two_step_lookahead(self):
+        best_score, best_idx = -float('inf'), 0
+        for i in range(len(self.operators)):
             tmp = copy.deepcopy(self)
-            tmp.merge_vertices(idx)
+            if not tmp.merge_vertices(i): continue
+            for j in range(len(tmp.operators)):
+                tmp2 = copy.deepcopy(tmp)
+                if not tmp2.merge_vertices(j): continue
+                score = tmp2.vertices[0] if len(tmp2.vertices) == 1 else sum(tmp2.vertices)
+                if score > best_score:
+                    best_score = score
+                    best_idx = i
+        return best_idx
+
+    #hard-模拟➕DP
+    def _simulate_with_dp(self):
+        best_score, best_idx = -float('inf'), 0
+        for i in range(len(self.operators)):
+            tmp = copy.deepcopy(self)
+            if not tmp.merge_vertices(i): continue
             score, _ = tmp.get_max_score_with_steps()
             if score > best_score:
                 best_score = score
-                best_edge = idx
-        return best_edge
+                best_idx = i
+        return best_idx
+
+    #hard++-蒙特卡洛树搜索简化版
+    def _mcts_simulation(self, sim_times=10):
+        def simulate_once(model):
+            tmp = copy.deepcopy(model)
+            while len(tmp.vertices) > 1:
+                idx = random.randint(0, len(tmp.operators) - 1)
+                tmp.merge_vertices(idx)
+            return tmp.vertices[0]
+
+        best_score, best_idx = -float('inf'), 0
+        for i in range(len(self.operators)):
+            scores = []
+            for _ in range(sim_times):
+                tmp = copy.deepcopy(self)
+                if not tmp.merge_vertices(i): continue
+                scores.append(simulate_once(tmp))
+            avg = sum(scores) / len(scores) if scores else -float('inf')
+            if avg > best_score:
+                best_score = avg
+                best_idx = i
+        return best_idx
+
+    # ---------- AI 选边：五种难度选择----------
+    def get_best_edge(self) -> int:
+        if len(self.vertices) <= 1:
+            return 0
+
+        if self.difficulty == 'easy':
+            return self._random_strategy()
+
+        elif self.difficulty == 'easy++':
+            return self._max_greedy_strategy()
+
+        elif self.difficulty == 'medium':
+            return self._two_step_lookahead()
+
+        elif self.difficulty == 'hard':
+            return self._simulate_with_dp()
+
+        elif self.difficulty == 'hard++':
+            return self._mcts_simulation()
+
+        else:
+            return self._simulate_with_dp()  # 默认 fallback
 
     # ---------- 动态规划求环形最大得分 ----------
     def get_max_score_with_steps(self):
