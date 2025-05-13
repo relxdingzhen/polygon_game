@@ -9,24 +9,36 @@ class PolyView(tk.Tk):
         self.title("多边形游戏")  # 设置窗口标题
         self.geometry("800x600")  # 设置窗口初始大小
         self.resizable(True, True)  # 允许窗口大小可调整
-        self.canvas = tk.Canvas(self, width=600, height=400, bg="white")
+        self.configure(background="#e3f2fd")
+        self.canvas = tk.Canvas(self, width=600, height=400, bg="#fff9c4", bd=4, relief=tk.SOLID, highlightbackground="#ffd54f", highlightcolor="#ffd54f", highlightthickness=4, borderwidth=0)
         self.canvas.pack(padx=10, pady=10)  # 增加一些内边距
-        self.status_label = tk.Label(self, text="游戏就绪", bd=1, relief=tk.SUNKEN, anchor=tk.W)
+        self.status_label = tk.Label(self, text="游戏就绪", relief=tk.SUNKEN, anchor=tk.W, bg="#fff9c4", bd=1, highlightbackground="#ffd54f", highlightcolor="#ffd54f", highlightthickness=4, borderwidth=0)
         self.status_label.pack(side=tk.BOTTOM, fill=tk.X)
 
         self.setup_ui()
 
     def setup_ui(self):
         # 创建控制面板，使用frame分隔布局
-        control_frame = tk.Frame(self)
+        control_frame = tk.Frame(self, bg="#e3f2fd")
         control_frame.pack(side=tk.TOP, fill=tk.X, pady=5)
 
         # 调整按钮的样式并居中
-        button_frame = tk.Frame(control_frame)
+        button_frame = tk.Frame(control_frame, bg="#e3f2fd")
         button_frame.pack(side=tk.TOP, pady=10)
 
         # 定义按钮样式
-        button_style = {'width': 10, 'height': 2, 'font': ("Arial", 12, "bold"), 'fg': "white"}
+        button_style = {
+            'width': 10,
+            'height': 2,
+            'font': ("Arial", 12, "bold"),
+            "bg": "#e3f2fd",
+            "fg": "#1565c0",
+            "bd": 2,
+            "relief": tk.SOLID,
+            "highlightbackground": "#90caf9",
+            "highlightcolor": "#90caf9",
+            "highlightthickness": 2
+        }
 
         # 按钮的背景色和文字颜色
         buttons = [
@@ -38,10 +50,20 @@ class PolyView(tk.Tk):
         ]
 
         for (text, command, bg_color) in buttons:
-            tk.Button(button_frame, text=text, command=command, bg=bg_color, **button_style).pack(side=tk.LEFT, padx=10)
+            button = tk.Button(button_frame, text=text, command=command, **button_style)
+            button.pack(side=tk.LEFT, padx=10)
+            button.bind("<Enter>", lambda event, b=button: b.config(bg="#f8bbd0", fg="#ffffff"))
+            button.bind("<Leave>", lambda event, b=button: b.config(bg="#fce4ec", fg="#d81b60"))
 
         # 绑定鼠标事件
         self.canvas.bind("<Button-1>", self.on_canvas_click)
+
+    def on_enter(self, button):
+        button.config(bg="#bbdefb", fg="#ffffff", highlightbackground="#64b5f6", highlightcolor="#64b5f6")
+
+    def on_leave(self, button):
+        button.config(bg="#e3f2fd", fg="#1565c0", highlightbackground="#90caf9", highlightcolor="#90caf9")
+
 
     def draw_polygon(self, vertices, operators):
         # 保存到实例

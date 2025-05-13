@@ -8,16 +8,45 @@ class AIVsHumanPage(tk.Tk):
         self.title("AI 人机对抗")
         self.geometry("400x250")
         self.resizable(False, False)
+        self.configure(background="#e3f2fd")
         self._build_ui()
 
     def _build_ui(self):
-        tk.Label(self, text="AI 人机对抗", font=("Arial", 16, "bold")).pack(pady=25)
-        tk.Button(self, text="开始对抗", width=18, height=2,
-                  bg="#FF9800", fg="white",
-                  command=self._start).pack(pady=20)
-        tk.Button(self, text="返回主菜单", width=18, height=2,
-                  bg="#9C27B0", fg="white",
-                  command=self._back).pack()
+        title_label = tk.Label(self, text="AI 人机对抗", font=("Arial", 16, "bold"),bg="#1565c0")
+        title_label.pack(pady=25)
+
+        button_style = {
+            "width": 18,
+            "height": 2,
+            "font": ("Arial", 12, "bold"),
+            "bg": "#e3f2fd",
+            "fg": "#1565c0",
+            "bd": 2,
+            "relief": tk.SOLID,
+            "highlightbackground": "#90caf9",
+            "highlightcolor": "#90caf9",
+            "highlightthickness": 2
+        }
+
+        start_button = tk.Button(self, text="开始对抗", width=18, height=2,
+                                 bg="#FF9800", fg="white",
+                                 command=self._start)
+        start_button.pack(pady=20)
+        start_button.bind("<Enter>", lambda event, btn=start_button: self.on_enter(btn))
+        start_button.bind("<Leave>", lambda event, btn=start_button: self.on_leave(btn))
+
+        back_button = tk.Button(self, text="返回主菜单", width=18, height=2,
+                                bg="#9C27B0", fg="white",
+                                command=self._back)
+        back_button.pack()
+        back_button.bind("<Enter>", lambda event, btn=back_button: self.on_enter(btn))
+        back_button.bind("<Leave>", lambda event, btn=back_button: self.on_leave(btn))
+
+    def on_enter(self, button):
+        button.config(bg="#bbdefb", fg="#ffffff", highlightbackground="#64b5f6", highlightcolor="#64b5f6")
+
+    def on_leave(self, button):
+        button.config(bg="#e3f2fd", fg="#1565c0", highlightbackground="#90caf9", highlightcolor="#90caf9")
 
     def _start(self):
         self.withdraw()                 # 隐藏当前菜单窗
