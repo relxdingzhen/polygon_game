@@ -41,7 +41,7 @@ class MainPage(tk.Tk):
 
         # 创建标题
         title_label = tk.Label(ui_frame, text="欢迎来到多边形游戏",
-                               font=("Arial", 16, "bold"), bg="#1565c0")
+                               font=("Arial", 16, "bold"), bg="#e3f2fd")
         title_label.pack(pady=30)
 
         # 创建按钮样式
