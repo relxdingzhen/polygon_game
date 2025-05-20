@@ -12,7 +12,7 @@ class AIVsHumanPage(tk.Tk):
         self._build_ui()
 
     def _build_ui(self):
-        title_label = tk.Label(self, text="AI 人机对抗", font=("Arial", 16, "bold"),bg="#1565c0")
+        title_label = tk.Label(self, text="AI 人机对抗", font=("Arial", 16, "bold"),bg="#e3f2fd")
         title_label.pack(pady=25)
 
         button_style = {
@@ -29,15 +29,15 @@ class AIVsHumanPage(tk.Tk):
         }
 
         start_button = tk.Button(self, text="开始对抗", width=18, height=2,
-                                 bg="#FF9800", fg="white",
-                                 command=self._start)
+                                 bg="#e3f2fd", fg="#1565c0",
+                                 command=self._start)           # FF9800
         start_button.pack(pady=20)
         start_button.bind("<Enter>", lambda event, btn=start_button: self.on_enter(btn))
         start_button.bind("<Leave>", lambda event, btn=start_button: self.on_leave(btn))
 
         back_button = tk.Button(self, text="返回主菜单", width=18, height=2,
-                                bg="#9C27B0", fg="white",
-                                command=self._back)
+                                bg="#e3f2fd", fg="#1565c0",
+                                command=self._back)             # 9C27B0
         back_button.pack()
         back_button.bind("<Enter>", lambda event, btn=back_button: self.on_enter(btn))
         back_button.bind("<Leave>", lambda event, btn=back_button: self.on_leave(btn))
